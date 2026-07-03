@@ -1,0 +1,6 @@
+{
+  "name": "Sypher AI",
+  "description": "Uma plataforma SaaS de inteligência e coprodutor de conteúdo premium para transformar rascunhos em ativos de alto nível, com estética minimalista e tom sofisticado.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
