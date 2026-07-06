@@ -1,12 +1,14 @@
+import cors from "cors";
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import serverless from "serverless-http";
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: "15mb" }));
@@ -427,7 +429,7 @@ function simulateResponse(format: string, tone: string, input: string): string {
     secondParagraph = `O sucesso sustentável de uma operação de negócios de alto nível está fundamentado na clareza de processos. Quando unimos posicionamento, atração previsível de clientes potenciais e refinamento contínuo da nossa mensagem comercial, as conversões acontecem de forma muito mais fluida.`;
     insight1 = "Geração imediata de autoridade. Entregar soluções práticas e conteúdo útil antes mesmo de vender cria confiança inabalável com os clientes.";
     insight2 = "Metrificação estruturada. Substituir a intuição por dados reais de conversão direciona os investimentos de tempo de forma inteligente.";
-    insight3 = "Simplificação da jornada do cliente. Remover atritos visuais e textuais nas etapas de conversão acelera as vendas de modo orgânico.";
+    insight3 = "Simplificação da jornada do cliente. Remover atritos visuais e textuais nas etapas de conversão altera as vendas de modo orgânico.";
     closing = "Processos bem otimizados geram escala previsível. Como você tem planejado a estruturação do seu fluxo de negócios recentemente?";
     hashtags = "#MarketingDigital #Vendas #SypherAI";
     capitalizedKeyword = "VendasEScala";
@@ -437,7 +439,7 @@ function simulateResponse(format: string, tone: string, input: string): string {
     title = `🎨 DESIGN COM PROPÓSITO: A estética visual a serviço da usabilidade`;
     secondParagraph = `O design de alto padrão visual é aquele que guia a atenção do usuário com total sutileza. Uma interface bem estruturada elimina a fadiga de decisão do leitor, transmite confiabilidade imediata para a marca e simplifica fluxos complexos em interações agradáveis.`;
     insight1 = "Redução ativa de atritos de interface. Menos cliques e layouts limpos geram experiências mais satisfatórias e aumentam a conversão.";
-    insight2 = "Hierarquia tipográfica e espacial. O posicionamento de cada col, tamanho de fonte e margem determina a leitura natural dos elementos.";
+    insight2 = "Hierarquia tipográfica e espacial. O posição de cada col, tamanho de fonte e margem determina a leitura natural dos elementos.";
     insight3 = "Consistência de marca. Manter um padrão visual impecável e de alto contraste gera reconhecimento forte e imediato perante o mercado.";
     closing = "A beleza de um produto criativo está em simplificar a jornada. Qual o detalhe de design que você julga indispensável hoje?";
     hashtags = "#DesignThinking #UIUX #SypherAI";
@@ -475,9 +477,16 @@ function simulateResponse(format: string, tone: string, input: string): string {
   }
 }
 
+// ---------------- EXPORT SERVERLESS HANDLER ----------------
+// Este wrapper do serverless-http permite que a AWS execute sua API Express
+export const handler = serverless(app);
+
 // ---------------- VITE MIDDLEWARE CONFIG ----------------
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    // Importa o Vite dinamicamente APENAS em ambiente de desenvolvimento local
+    const { createServer: createViteServer } = await import("vite");
+    
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -486,7 +495,6 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    // Serve index.html for undefined routes, matching SPA router approach
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
@@ -497,4 +505,7 @@ async function startServer() {
   });
 }
 
-startServer();
+// Apenas executa startServer() se NÃO estivermos rodando dentro da infraestrutura de Lambda da AWS
+if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  startServer();
+}

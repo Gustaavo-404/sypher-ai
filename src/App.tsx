@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { 
-  Wand2, 
-  Copy, 
-  Linkedin, 
-  Mail, 
-  FileText, 
-  Twitter, 
-  Briefcase, 
+import {
+  Wand2,
+  Copy,
+  Linkedin,
+  Mail,
+  FileText,
+  Twitter,
+  Briefcase,
   ExternalLink,
   ChevronDown,
   Globe,
@@ -35,8 +35,8 @@ import AboutPage from "./components/AboutPage";
 function HelpTooltip({ text }: { text: string }) {
   return (
     <div className="relative group inline-block ml-1.5 align-middle">
-      <button 
-        type="button" 
+      <button
+        type="button"
         className="text-zinc-500 hover:text-red-500 transition-colors focus:outline-hidden cursor-help"
         aria-label="Help info"
       >
@@ -145,9 +145,9 @@ export default function App() {
     setLang(l);
     try {
       localStorage.setItem("sypher_lang", l);
-    } catch {}
+    } catch { }
     addNotification(
-      l === 'pt' ? "Idioma definido para Português" : l === 'en' ? "Language changed to English" : "Idioma cambiado a Español", 
+      l === 'pt' ? "Idioma definido para Português" : l === 'en' ? "Language changed to English" : "Idioma cambiado a Español",
       "info"
     );
   };
@@ -178,7 +178,7 @@ export default function App() {
   const [selectedTone, setSelectedTone] = useState<ToneType | null>(null);
   const [customInstructions, setCustomInstructions] = useState("");
   const [outputText, setOutputText] = useState("");
-  
+
   // Generator UI feedback mechanics
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState("");
@@ -274,14 +274,14 @@ export default function App() {
     if (currentView === 'app') {
       setBooting(true);
       setBootProgress(0);
-      
+
       const bootSteps = {
         pt: ["Calibrando o motor", "Preparando workspace", "Carregando refinaria", "Pronto"],
         en: ["Calibrating engine", "Preparing workspace", "Loading refinery", "Ready"],
         es: ["Calibrando el motor", "Preparing workspace", "Cargando refinería", "Listo"]
       };
       const activeBootSteps = bootSteps[lang] || bootSteps.en;
-      
+
       let progress = 0;
       setBootStepText(activeBootSteps[0]);
       setBootProgress(0);
@@ -301,7 +301,7 @@ export default function App() {
           setBooting(false);
         }
       }, intervalTime);
-      
+
       return () => clearInterval(timer);
     } else {
       setBooting(false);
@@ -405,8 +405,8 @@ export default function App() {
         lang === 'en'
           ? "Input draft exceeds 500 characters limit!"
           : lang === 'es'
-          ? "¡El borrador supera el límite de 500 caracteres!"
-          : "O rascunho ultrapassa o limite de 500 caracteres!",
+            ? "¡El borrador supera el límite de 500 caracteres!"
+            : "O rascunho ultrapassa o limite de 500 caracteres!",
         "info"
       );
       return;
@@ -414,11 +414,11 @@ export default function App() {
 
     if (!selectedFormat) {
       addNotification(
-        lang === 'en' 
-          ? "Please select a channel/format (Step 2) before polishing!" 
-          : lang === 'es' 
-          ? "¡Por favor, seleccione un formato (Paso 2) antes de pulir!" 
-          : "Por favor, selecione um canal/formato (Etapa 2) antes de polir!",
+        lang === 'en'
+          ? "Please select a channel/format (Step 2) before polishing!"
+          : lang === 'es'
+            ? "¡Por favor, seleccione un formato (Paso 2) antes de pulir!"
+            : "Por favor, selecione um canal/formato (Etapa 2) antes de polir!",
         "info"
       );
       return;
@@ -426,11 +426,11 @@ export default function App() {
 
     if (!selectedTone) {
       addNotification(
-        lang === 'en' 
-          ? "Please select a voice tone profile (Step 3) before polishing!" 
-          : lang === 'es' 
-          ? "¡Por favor, seleccione un perfil de tono (Paso 3) antes de pulir!" 
-          : "Por favor, selecione um tom de voz (Etapa 3) antes de polir!",
+        lang === 'en'
+          ? "Please select a voice tone profile (Step 3) before polishing!"
+          : lang === 'es'
+            ? "¡Por favor, seleccione un perfil de tono (Paso 3) antes de pulir!"
+            : "Por favor, selecione um tom de voz (Etapa 3) antes de polir!",
         "info"
       );
       return;
@@ -439,7 +439,9 @@ export default function App() {
     setIsGenerating(true);
     runGenerationMeters(async () => {
       try {
-        const response = await fetch("/api/gemini/generate", {
+        const API_URL = import.meta.env.VITE_API_URL || "";
+
+        const response = await fetch(`${API_URL}/api/gemini/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -455,20 +457,20 @@ export default function App() {
         }
 
         const data = await response.json();
-        
+
         setOutputText(data.text);
         if (data.isSimulated) {
           addNotification(
-            lang === 'en' 
-              ? "Running in simulation sandbox mode! Add GEMINI_API_KEY to activate Gemini AI." 
+            lang === 'en'
+              ? "Running in simulation sandbox mode! Add GEMINI_API_KEY to activate Gemini AI."
               : lang === 'es'
-              ? "¡Simulador activo! Proporcione GEMINI_API_KEY para activar la IA en directo."
-              : "Simulador ativo! Para usar a IA real, coloque a GEMINI_API_KEY.", 
+                ? "¡Simulador activo! Proporcione GEMINI_API_KEY para activar la IA en directo."
+                : "Simulador ativo! Para usar a IA real, coloque a GEMINI_API_KEY.",
             "info"
           );
         } else {
           addNotification(
-            lang === 'en' ? "Draft successfully processed via Sypher core!" : lang === 'es' ? "¡Borrador refinado exitosamente!" : "Rascunho processado com maestria pelo Sypher AI!", 
+            lang === 'en' ? "Draft successfully processed via Sypher core!" : lang === 'es' ? "¡Borrador refinado exitosamente!" : "Rascunho processado com maestria pelo Sypher AI!",
             "success"
           );
         }
@@ -490,7 +492,9 @@ export default function App() {
 
     setIsRefining(true);
     try {
-      const response = await fetch("/api/gemini/refine", {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+
+      const response = await fetch(`${API_URL}/api/gemini/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -507,7 +511,7 @@ export default function App() {
       setOutputText(data.text);
       setRefinementQuery("");
       addNotification(
-        lang === 'en' ? "Adjusted text successfully!" : lang === 'es' ? "¡Texto modificado con éxito!" : "Ajustes aplicados com sucesso!", 
+        lang === 'en' ? "Adjusted text successfully!" : lang === 'es' ? "¡Texto modificado con éxito!" : "Ajustes aplicados com sucesso!",
         "success"
       );
 
@@ -526,11 +530,11 @@ export default function App() {
 
   const downloadTextFile = (format: 'txt' | 'md' | 'html' | 'json') => {
     if (!outputText) return;
-    
+
     let mimeType = 'text/plain';
     let content = outputText;
     let extension = format;
-    
+
     if (format === 'md') {
       mimeType = 'text/markdown';
     } else if (format === 'html') {
@@ -616,7 +620,7 @@ export default function App() {
         refined_content: outputText
       }, null, 2);
     }
-    
+
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `sypher-export-${timestamp}.${extension}`;
     const blob = new Blob([content], { type: mimeType });
@@ -628,13 +632,13 @@ export default function App() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
+
     addNotification(
-      lang === 'en' 
-        ? `Successfully downloaded .${extension.toUpperCase()} file!` 
-        : lang === 'es' 
-        ? `¡Archivo .${extension.toUpperCase()} descargado con éxito!` 
-        : `Arquivo .${extension.toUpperCase()} baixado com sucesso!`,
+      lang === 'en'
+        ? `Successfully downloaded .${extension.toUpperCase()} file!`
+        : lang === 'es'
+          ? `¡Archivo .${extension.toUpperCase()} descargado con éxito!`
+          : `Arquivo .${extension.toUpperCase()} baixado com sucesso!`,
       "success"
     );
   };
@@ -672,7 +676,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#000000] font-sans antialiased text-[#E5E5E5] relative overflow-x-hidden" id="scribecraft-saas-root">
-      
+
       {/* SECURE WORKSPACE BOOT SEQUENCE (PREMIUM ENTRANCE ANIME) */}
       <AnimatePresence>
         {booting && (
@@ -691,11 +695,10 @@ export default function App() {
                   return (
                     <div
                       key={i}
-                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 border transition-colors duration-300 ${
-                        isSquareFilled
-                          ? "bg-red-500 border-red-500"
-                          : "bg-transparent border-zinc-700"
-                      }`}
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 border transition-colors duration-300 ${isSquareFilled
+                        ? "bg-red-500 border-red-500"
+                        : "bg-transparent border-zinc-700"
+                        }`}
                     />
                   );
                 })}
@@ -719,13 +722,13 @@ export default function App() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="flex flex-col min-h-screen min-w-0 w-full overflow-x-hidden"
       >
-        
+
         {/* Main Application Header */}
         <header className="sticky top-0 z-40 w-full border-b border-white/[0.04] bg-[#030304]/85 backdrop-blur-md shrink-0" id="app-header">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-            
+
             {/* Logo and brand name */}
-            <div 
+            <div
               className="flex items-center gap-3 cursor-pointer shrink-0"
               onClick={() => {
                 setMobileMenuOpen(false);
@@ -733,10 +736,10 @@ export default function App() {
               }}
             >
               <div className="w-9 h-9 overflow-hidden flex items-center justify-center">
-                <img 
-                  src={sypherLogo} 
-                  alt="Sypher Logo" 
-                  className="w-full h-full object-cover" 
+                <img
+                  src={sypherLogo}
+                  alt="Sypher Logo"
+                  className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -764,7 +767,7 @@ export default function App() {
 
               {/* Language Switcher Dropdown */}
               <div className="relative inline-block text-left" ref={langDropdownRef}>
-                <button 
+                <button
                   onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#08080a] hover:bg-zinc-900 border border-white/[0.05] rounded-none text-xs text-zinc-300 hover:text-white transition-all cursor-pointer font-sans font-medium"
                 >
@@ -777,20 +780,18 @@ export default function App() {
                     {languages.map((item) => {
                       const isActive = lang === item.code;
                       return (
-                        <button 
+                        <button
                           key={item.code}
                           type="button"
                           onClick={() => { changeLang(item.code as Language); setLangDropdownOpen(false); }}
-                          className={`w-full text-left px-3.5 py-2 text-xs font-sans font-medium transition flex items-center justify-between hover:bg-white/[0.02] group ${
-                            isActive ? 'text-white bg-red-950/15' : 'text-zinc-400 hover:text-white'
-                          }`}
+                          className={`w-full text-left px-3.5 py-2 text-xs font-sans font-medium transition flex items-center justify-between hover:bg-white/[0.02] group ${isActive ? 'text-white bg-red-950/15' : 'text-zinc-400 hover:text-white'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <span className={`font-mono text-[9px] px-1 py-0.5 border rounded-xs transition-colors duration-150 ${
-                              isActive 
-                                ? 'bg-red-500/10 border-red-500/20 text-red-400 font-bold' 
-                                : 'bg-white/[0.03] border-white/[0.05] text-zinc-500 group-hover:text-zinc-300 group-hover:border-white/10'
-                            }`}>
+                            <span className={`font-mono text-[9px] px-1 py-0.5 border rounded-xs transition-colors duration-150 ${isActive
+                              ? 'bg-red-500/10 border-red-500/20 text-red-400 font-bold'
+                              : 'bg-white/[0.03] border-white/[0.05] text-zinc-500 group-hover:text-zinc-300 group-hover:border-white/10'
+                              }`}>
                               {item.badge}
                             </span>
                             <span className={isActive ? "font-semibold" : ""}>{item.label}</span>
@@ -925,11 +926,11 @@ export default function App() {
                     <span className="text-white font-bold uppercase tracking-wider mr-1.5">
                       {lang === 'en' ? "Notice:" : lang === 'es' ? "Aviso:" : "Aviso:"}
                     </span>
-                    {lang === 'en' 
-                      ? "This workspace runs on state-of-the-art AI. Verify all generated texts before distribution." 
+                    {lang === 'en'
+                      ? "This workspace runs on state-of-the-art AI. Verify all generated texts before distribution."
                       : lang === 'es'
-                      ? "Este espacio de trabajo funciona con IA de última generación. Verifique la precisión antes de compartir."
-                      : "Este espaço de trabalho funciona com IA de última geração. Verifique a precisão dos dados antes de compartilhar."
+                        ? "Este espacio de trabajo funciona con IA de última generación. Verifique la precisión antes de compartir."
+                        : "Este espaço de trabalho funciona com IA de última geração. Verifique a precisão dos dados antes de compartilhar."
                     }
                   </p>
                 </div>
@@ -948,11 +949,11 @@ export default function App() {
 
         {/* Content Area */}
         <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 pb-16">
-          
+
           {/* Interactive Procedure Steps Header */}
           <div className="w-full mb-8 relative" id="sypher-progress-sequence-panel">
             <div className="relative h-1 bg-zinc-900 rounded-full overflow-hidden mb-3">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-red-700 via-red-600 to-red-500 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(239,68,68,0.4)]"
                 style={{ width: `${progressPercent}%` }}
               />
@@ -960,9 +961,9 @@ export default function App() {
 
             {/* Steps Text Labels */}
             <div className="relative flex justify-between items-center w-full px-1">
-              
+
               {/* Step 1 Checkpoint */}
-              <button 
+              <button
                 type="button"
                 onClick={() => document.getElementById("step-1-container")?.scrollIntoView({ behavior: 'smooth' })}
                 className="flex flex-col items-start text-left group cursor-pointer focus:outline-hidden"
@@ -973,7 +974,7 @@ export default function App() {
               </button>
 
               {/* Step 2 Checkpoint */}
-              <button 
+              <button
                 type="button"
                 onClick={() => document.getElementById("step-2-container")?.scrollIntoView({ behavior: 'smooth' })}
                 className="flex flex-col items-center text-center group cursor-pointer focus:outline-hidden"
@@ -984,7 +985,7 @@ export default function App() {
               </button>
 
               {/* Step 3 Checkpoint */}
-              <button 
+              <button
                 type="button"
                 onClick={() => document.getElementById("step-3-container")?.scrollIntoView({ behavior: 'smooth' })}
                 className="flex flex-col items-center text-center group cursor-pointer focus:outline-hidden"
@@ -995,7 +996,7 @@ export default function App() {
               </button>
 
               {/* Step 4 Checkpoint */}
-              <button 
+              <button
                 type="button"
                 onClick={() => document.getElementById("workspace-output-panel")?.scrollIntoView({ behavior: 'smooth' })}
                 className="flex flex-col items-end text-right group cursor-pointer focus:outline-hidden"
@@ -1009,28 +1010,27 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="view-editor">
-            
+
             {/* Left Column: Input and Format configuration */}
             <div className="lg:col-span-5 space-y-6">
-              
+
               {/* Input section */}
-              <div 
-                className={`p-5 border transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 1 
-                    ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20" 
-                    : "bg-[#08080a] border-white/[0.04]"
-                }`}
+              <div
+                className={`p-5 border transition-all duration-300 ${tutorialActive && currentTutorialStep === 1
+                  ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20"
+                  : "bg-[#08080a] border-white/[0.04]"
+                  }`}
                 id="step-1-container"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
                     <h3 className="text-xs font-sans font-bold text-zinc-400 uppercase tracking-widest">{t.editor.step_1}</h3>
                     <HelpTooltip text={
-                      lang === 'en' 
-                        ? "Paste raw ideas, audio transcripts, or chaotic notes here. Sypher will rewrite them." 
+                      lang === 'en'
+                        ? "Paste raw ideas, audio transcripts, or chaotic notes here. Sypher will rewrite them."
                         : lang === 'es'
-                        ? "Pegue aquí ideas preliminares, actas caóticas o notas sueltas. Sypher las organizará."
-                        : "Cole notas soltas, transcrições inconsistentes ou ideias sob pressão. O Sypher vai lapidá-las."
+                          ? "Pegue aquí ideas preliminares, actas caóticas o notas sueltas. Sypher las organizará."
+                          : "Cole notas soltas, transcrições inconsistentes ou ideias sob pressão. O Sypher vai lapidá-las."
                     } />
                   </div>
                   <div className="flex items-center gap-1.5 font-mono text-[9px]">
@@ -1040,7 +1040,7 @@ export default function App() {
                     <span className="text-zinc-600 uppercase">max</span>
                   </div>
                 </div>
-                
+
                 <textarea
                   value={rawInput}
                   onChange={(e) => setRawInput(e.target.value.slice(0, 500))}
@@ -1055,14 +1055,14 @@ export default function App() {
                 <div className="mt-3">
                   <span className="text-[10px] font-sans font-semibold text-zinc-500 block mb-1.5 uppercase tracking-wider">{t.editor.example_title}</span>
                   <div className="flex flex-wrap gap-2">
-                     <button
+                    <button
                       type="button"
                       onClick={() => loadExample(
-                        lang === 'en' 
+                        lang === 'en'
                           ? "just hit a new enterprise contract with delta. Key takeaways: always listen to the stakeholder requirements before discussing pricing."
                           : lang === 'es'
-                          ? "acabo de cerrar un contrato corporativo con delta. lección: escuchar los requisitos clave del cliente antes de discutir el preço final."
-                          : "acabei de fechar um contrato novo com a delta global e aprendi que escutar antes de falar o preco é a chave da proposta."
+                            ? "acabo de cerrar un contrato corporativo con delta. lección: escuchar los requisitos clave del cliente antes de discutir el preço final."
+                            : "acabei de fechar um contrato novo com a delta global e aprendi que escutar antes de falar o preco é a chave da proposta."
                       )}
                       className="bg-black border border-white/[0.04] hover:border-red-500/30 text-[10px] px-2.5 py-1 text-zinc-500 hover:text-white transition rounded-none cursor-pointer"
                     >
@@ -1074,8 +1074,8 @@ export default function App() {
                         lang === 'en'
                           ? "email template for Joana to advance customer onboarding to Thursday at 3PM, because I have a medical leave scheduled on Friday."
                           : lang === 'es'
-                          ? "correo para juana solicitando adelantar la reunión de onboarding al jueves a las 3pm, ya que el viernes tengo consulta médica."
-                          : "email para joana sobre adiantar a reunião de onboarding de clientes novos para quinta às 15h, pois sexta terei um compromisso médico."
+                            ? "correo para juana solicitando adelantar la reunión de onboarding al jueves a las 3pm, ya que el viernes tengo consulta médica."
+                            : "email para joana sobre adiantar a reunião de onboarding de clientes novos para quinta às 15h, pois sexta terei um compromisso médico."
                       )}
                       className="bg-black border border-white/[0.04] hover:border-red-500/30 text-[10px] px-2.5 py-1 text-zinc-500 hover:text-white transition rounded-none cursor-pointer"
                     >
@@ -1086,12 +1086,11 @@ export default function App() {
               </div>
 
               {/* Format selection */}
-              <div 
-                className={`p-5 border transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 2 
-                    ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20" 
-                    : "bg-[#08080a] border-white/[0.04]"
-                }`}
+              <div
+                className={`p-5 border transition-all duration-300 ${tutorialActive && currentTutorialStep === 2
+                  ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20"
+                  : "bg-[#08080a] border-white/[0.04]"
+                  }`}
                 id="step-2-container"
               >
                 <div className="flex items-center justify-between mb-3">
@@ -1101,8 +1100,8 @@ export default function App() {
                       lang === 'en'
                         ? "Select your target format. Sypher adapts structural layouts and metadata."
                         : lang === 'es'
-                        ? "Seleccione el formato final. Sypher ajustará la estructura y metadatos correspondientes."
-                        : "Selecione o formato de destino. O Sypher reestrutura o layout e os metadados."
+                          ? "Seleccione el formato final. Sypher ajustará la estructura y metadatos correspondientes."
+                          : "Selecione o formato de destino. O Sypher reestrutura o layout e os metadados."
                     } />
                   </div>
                   <span className="text-[10px] font-sans text-zinc-500 font-medium">{t.editor.unit_refiner}</span>
@@ -1113,7 +1112,7 @@ export default function App() {
                     const isSelected = selectedFormat === tmpl.id;
                     let activeBorder = "border-red-500 bg-red-950/20 text-red-500";
                     let activeIconBg = "bg-red-500 text-black";
-                    
+
                     if (tmpl.id === "linkedin_post") {
                       activeBorder = "border-sky-500/70 bg-sky-950/20 text-sky-400";
                       activeIconBg = "bg-sky-550 bg-sky-500 text-black";
@@ -1136,13 +1135,11 @@ export default function App() {
                         key={tmpl.id}
                         type="button"
                         onClick={() => setSelectedFormat(tmpl.id)}
-                        className={`p-2.5 rounded-none border text-left flex items-start gap-2.5 transition duration-150 cursor-pointer ${
-                          isSelected ? activeBorder : "border-white/[0.04] hover:bg-black/40"
-                        }`}
+                        className={`p-2.5 rounded-none border text-left flex items-start gap-2.5 transition duration-150 cursor-pointer ${isSelected ? activeBorder : "border-white/[0.04] hover:bg-black/40"
+                          }`}
                       >
-                        <div className={`p-1 text-xs shrink-0 flex items-center justify-center ${
-                          isSelected ? activeIconBg : "bg-black border border-white/[0.04] text-zinc-500"
-                        }`}>
+                        <div className={`p-1 text-xs shrink-0 flex items-center justify-center ${isSelected ? activeIconBg : "bg-black border border-white/[0.04] text-zinc-500"
+                          }`}>
                           {tmpl.id === 'linkedin_post' && <Linkedin className="w-3.5 h-3.5" />}
                           {tmpl.id === 'professional_email' && <Mail className="w-3.5 h-3.5" />}
                           {tmpl.id === 'blog_draft' && <FileText className="w-3.5 h-3.5" />}
@@ -1167,14 +1164,13 @@ export default function App() {
 
             {/* Right Column */}
             <div className="lg:col-span-7 space-y-6" id="editor-view-right-column">
-              
+
               {/* Voice Tones */}
-              <div 
-                className={`p-5 border transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 3 
-                    ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20" 
-                    : "bg-[#08080a] border-white/[0.04]"
-                }`}
+              <div
+                className={`p-5 border transition-all duration-300 ${tutorialActive && currentTutorialStep === 3
+                  ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20"
+                  : "bg-[#08080a] border-white/[0.04]"
+                  }`}
                 id="step-3-container"
               >
                 <div className="flex items-center mb-3">
@@ -1183,15 +1179,15 @@ export default function App() {
                     lang === 'en'
                       ? "Configure the writing tone. Sypher adapts the vocabulary and phrasing style."
                       : lang === 'es'
-                      ? "Establezca el tono de voz. Sypher adaptará el nivel de formalidad."
-                      : "Defina o tom de voz. O Sypher altera a formalidade e estilo do texto."
+                        ? "Establezca el tono de voz. Sypher adaptará el nivel de formalidad."
+                        : "Defina o tom de voz. O Sypher altera a formalidade e estilo do texto."
                   } />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {TONE_OPTIONS.map((tn) => {
                     const isSelected = selectedTone === tn.id;
                     let toneBorderAndBg = "border-red-500 bg-red-950/20 text-red-500";
-                    
+
                     if (isSelected) {
                       if (tn.id === "profissional") {
                         toneBorderAndBg = "border-emerald-500 bg-emerald-950/20 text-emerald-400";
@@ -1209,9 +1205,8 @@ export default function App() {
                         key={tn.id}
                         type="button"
                         onClick={() => setSelectedTone(tn.id)}
-                        className={`p-2 rounded-none text-center border cursor-pointer hover:bg-black/30 transition-all duration-150 flex flex-col items-center justify-center ${
-                          isSelected ? toneBorderAndBg : "border-white/[0.04] text-zinc-400"
-                        }`}
+                        className={`p-2 rounded-none text-center border cursor-pointer hover:bg-black/30 transition-all duration-150 flex flex-col items-center justify-center ${isSelected ? toneBorderAndBg : "border-white/[0.04] text-zinc-400"
+                          }`}
                       >
                         <span className="text-xs font-semibold block truncate w-full">
                           {t.tones[tn.id as keyof typeof t.tones]?.label || tn.label}
@@ -1223,12 +1218,11 @@ export default function App() {
               </div>
 
               {/* Copilot Guidelines */}
-              <div 
-                className={`p-5 border transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 4 
-                    ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20" 
-                    : "bg-[#08080a] border-white/[0.04]"
-                }`}
+              <div
+                className={`p-5 border transition-all duration-300 ${tutorialActive && currentTutorialStep === 4
+                  ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20"
+                  : "bg-[#08080a] border-white/[0.04]"
+                  }`}
                 id="step-4-guidelines"
               >
                 <div className="flex items-center mb-2">
@@ -1237,8 +1231,8 @@ export default function App() {
                     lang === 'en'
                       ? "Optional directives such as 'limit to 3 paragraphs' or 'no hashtags'."
                       : lang === 'es'
-                      ? "Pautas adicionales opcionales, como 'máximo de 3 párrafos' o 'sin hashtags'."
-                      : "Diretrizes opcionais extras, como 'máximo de 3 parágrafos' ou 'evitar emojis'."
+                        ? "Pautas adicionales opcionales, como 'máximo de 3 párrafos' o 'sin hashtags'."
+                        : "Diretrizes opcionais extras, como 'máximo de 3 parágrafos' ou 'evitar emojis'."
                   } />
                 </div>
                 <input
@@ -1251,21 +1245,20 @@ export default function App() {
               </div>
 
               {/* Trigger Action Panel */}
-              <div 
-                className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3 transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 4 
-                    ? "relative z-45 bg-[#030304] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20 p-5" 
-                    : ""
-                }`}
+              <div
+                className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3 transition-all duration-300 ${tutorialActive && currentTutorialStep === 4
+                  ? "relative z-45 bg-[#030304] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20 p-5"
+                  : ""
+                  }`}
                 id="step-4-trigger"
               >
                 <div className="text-left">
                   {/* Sypher Active Status Badge */}
                   <div className="flex items-center gap-3 bg-[#0d0d0f]/80 p-2 border border-white/[0.03]">
                     <div className="w-8 h-8 shrink-0 overflow-hidden">
-                      <img 
-                        src={sypherLogo} 
-                        alt="Sypher Head" 
+                      <img
+                        src={sypherLogo}
+                        alt="Sypher Head"
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
@@ -1273,11 +1266,11 @@ export default function App() {
                     <div className="text-left">
                       <span className="text-[9px] font-sans text-red-400 font-bold uppercase tracking-wider block">Sypher AI Copilot</span>
                       <p className="text-[9px] text-zinc-400 leading-normal">
-                        {lang === 'en' 
-                          ? "Sypher is online and ready to process your draft sequence." 
+                        {lang === 'en'
+                          ? "Sypher is online and ready to process your draft sequence."
                           : lang === 'es'
-                          ? "Sypher está en línea y listo para procesar la secuencia de su borrador."
-                          : "Sypher está online e pronto para processar a sequência do seu rascunho."}
+                            ? "Sypher está en línea y listo para procesar la secuencia de su borrador."
+                            : "Sypher está online e pronto para processar a sequência do seu rascunho."}
                       </p>
                     </div>
                   </div>
@@ -1305,12 +1298,11 @@ export default function App() {
               </div>
 
               {/* Rich Output display */}
-              <div 
-                className={`border overflow-hidden transition-all duration-300 ${
-                  tutorialActive && currentTutorialStep === 4 
-                    ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20" 
-                    : "bg-[#08080a] border-white/[0.04]"
-                }`} 
+              <div
+                className={`border overflow-hidden transition-all duration-300 ${tutorialActive && currentTutorialStep === 4
+                  ? "relative z-45 bg-[#08080a] border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.35)] ring-1 ring-red-500/20"
+                  : "bg-[#08080a] border-white/[0.04]"
+                  }`}
                 id="workspace-output-panel"
               >
                 <div className="bg-[#0d0d0f] border-b border-white/[0.04] px-5 py-3 flex items-center justify-between">
@@ -1361,11 +1353,10 @@ export default function App() {
                             return (
                               <motion.div
                                 key={i}
-                                className={`w-3.5 border transition-all duration-300 ${
-                                  isSquareFilled
-                                    ? "bg-red-500 border-red-500"
-                                    : "bg-transparent border-zinc-700"
-                                }`}
+                                className={`w-3.5 border transition-all duration-300 ${isSquareFilled
+                                  ? "bg-red-500 border-red-500"
+                                  : "bg-transparent border-zinc-700"
+                                  }`}
                                 style={{ originY: 0.5 }}
                                 animate={{
                                   height: isSquareFilled ? ["14px", "52px", "14px"] : "14px",
@@ -1465,11 +1456,10 @@ export default function App() {
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className={`p-3 rounded-none text-xs flex items-center gap-2 border shadow-2xl ${
-                toast.type === "success"
-                  ? "bg-black border-emerald-500/30 text-emerald-400"
-                  : "bg-black border-red-500/20 text-red-500"
-              }`}
+              className={`p-3 rounded-none text-xs flex items-center gap-2 border shadow-2xl ${toast.type === "success"
+                ? "bg-black border-emerald-500/30 text-emerald-400"
+                : "bg-black border-red-500/20 text-red-500"
+                }`}
             >
               <div className={`w-1.5 h-1.5 ${toast.type === 'success' ? 'bg-emerald-400' : 'bg-red-500'}`} />
               <p className="font-sans font-bold text-white leading-none">{toast.message}</p>
@@ -1480,7 +1470,7 @@ export default function App() {
 
       {/* Interactive Tutorial Backdrop Shadow Overlay */}
       {tutorialActive && (
-        <div 
+        <div
           className="fixed inset-0 bg-[#000000]/80 z-40 pointer-events-auto transition-opacity duration-300"
           onClick={stopTutorial}
           id="tutorial-backdrop"
@@ -1495,7 +1485,7 @@ export default function App() {
               <span className="text-[10px] font-sans font-bold text-red-500 uppercase tracking-widest">
                 {lang === 'en' ? `Step ${currentTutorialStep} of 4` : lang === 'es' ? `Paso ${currentTutorialStep} de 4` : `Etapa ${currentTutorialStep} de 4`}
               </span>
-              <button 
+              <button
                 onClick={stopTutorial}
                 className="text-zinc-500 hover:text-white text-xs transition-colors cursor-pointer"
                 aria-label="Close tutorial"
@@ -1512,11 +1502,10 @@ export default function App() {
             <div className="flex items-center justify-between">
               <div className="flex gap-1.5">
                 {[1, 2, 3, 4].map((stepNum) => (
-                  <div 
-                    key={stepNum} 
-                    className={`w-1.5 h-1.5 transition-all duration-300 ${
-                      currentTutorialStep === stepNum ? 'bg-red-500 w-3.5' : 'bg-zinc-700'
-                    }`}
+                  <div
+                    key={stepNum}
+                    className={`w-1.5 h-1.5 transition-all duration-300 ${currentTutorialStep === stepNum ? 'bg-red-500 w-3.5' : 'bg-zinc-700'
+                      }`}
                   />
                 ))}
               </div>
@@ -1533,7 +1522,7 @@ export default function App() {
                   onClick={nextTutorialStep}
                   className="px-3.5 py-1 text-[11px] font-sans font-bold bg-red-600 hover:bg-red-500 text-white transition cursor-pointer"
                 >
-                  {currentTutorialStep === 4 
+                  {currentTutorialStep === 4
                     ? (lang === 'en' ? "Finish" : lang === 'es' ? "Finalizar" : "Concluir")
                     : (lang === 'en' ? "Next" : lang === 'es' ? "Siguiente" : "Próximo")
                   }
