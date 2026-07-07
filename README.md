@@ -4,12 +4,14 @@
 
 # Sypher AI
 
-**Premium web platform for AI-powered text refinement — polish your writing for LinkedIn, Twitter/X, email, and more. Sypher AI is written in TypeScript, React/Vite and Node.js/Express**
+**Premium web platform for AI-powered text refinement — polish your writing for LinkedIn, Twitter/X, email, and more.**
+
+**Live at [sypher.ia.br](https://sypher.ia.br)**
 
 ![Build Status](https://img.shields.io/badge/build-passing-00C49F)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-active-success)
+![Status](https://img.shields.io/badge/status-live-success)
 
 </div>
 
@@ -36,7 +38,7 @@ All refinements are powered by **Google Gemini**, combined with a custom prompt 
 
 # ⭕ Tech Stack
 
-Sypher AI was built using a modern full-stack architecture focused on performance, polish, and a premium user experience.
+Sypher AI runs on a modern, fully Serverless full-stack architecture on AWS, focused on performance, polish, and a premium user experience.
 
 ### Frontend
 
@@ -57,45 +59,57 @@ Sypher AI was built using a modern full-stack architecture focused on performanc
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![esbuild](https://img.shields.io/badge/esbuild-FFCF00?style=for-the-badge&logo=esbuild&logoColor=black)
 
+### Cloud & Infrastructure
+
+![AWS Lambda](https://img.shields.io/badge/AWS_Lambda-FF9900?style=for-the-badge&logo=awslambda&logoColor=white)
+![API Gateway](https://img.shields.io/badge/API_Gateway_v2-FF9900?style=for-the-badge&logo=amazonapigateway&logoColor=white)
+![S3](https://img.shields.io/badge/Amazon_S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
+![CloudFront](https://img.shields.io/badge/CloudFront-8C4FFF?style=for-the-badge&logo=amazonaws&logoColor=white)
+![ACM](https://img.shields.io/badge/AWS_Certificate_Manager-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Serverless Framework](https://img.shields.io/badge/Serverless_Framework-FD5750?style=for-the-badge&logo=serverless&logoColor=white)
+
 ### AI Integration
 
 ![Gemini](https://img.shields.io/badge/Google_Gemini-8E75FF?style=for-the-badge&logo=googlegemini&logoColor=white)
 ![Prompt Layer](https://img.shields.io/badge/Prompt_%2F_Data_Layer-FF6B6B?style=for-the-badge)
 
-### DevOps
+---
 
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Env Config](https://img.shields.io/badge/Env_Config-4CAF50?style=for-the-badge)
-![Vite Build](https://img.shields.io/badge/Vite_%2B_esbuild_Pipeline-646CFF?style=for-the-badge)
+# ⭕ Architecture
+
+Sypher AI is hosted on a 100% Serverless architecture on AWS:
+
+- **Frontend** — static build served from **Amazon S3**, distributed globally through **Amazon CloudFront**.
+- **Backend** — REST API built with **Express.js**, running inside **AWS Lambda** functions integrated with **API Gateway v2 (HTTP API)**.
+- **Routing & CORS** — CloudFront acts as a single entry point, routing frontend and API traffic (`/api/*`) through the same domain, solving CORS natively and reducing overall network latency.
+- **DNS & SSL** — domain and DNS managed via **Cloudflare** / Registro.br, with SSL/TLS certificates issued through **AWS Certificate Manager (ACM)**.
+- **Performance** — backend deploy package optimized with **esbuild** (tree shaking + strict production dependency isolation), reducing bundle size by **97%** (~80MB → 1.5MB) and drastically improving Lambda cold start time.
+
+```
+Frontend (React + Vite) — Amazon S3 + CloudFront
+│
+├── Landing / Docs / About Pages
+├── Text Refinement Interface
+├── AI Demo Preview
+└── Data Visualization Layer (Recharts)
+
+Backend (Node.js + Express) — AWS Lambda + API Gateway v2
+│
+├── API Layer
+├── Prompt / Data Abstraction Layer
+└── Gemini AI Integration
+```
 
 ---
 
-## 1️⃣ Refine Your Draft
+# ⭕ How It Works
 
-Paste your raw text and let Sypher AI analyze tone, clarity, and structure.
-
-<img src="docs/screenshots/screenshot-1.png" width="900"/>
-
-> **Start with any draft.**
-> Sypher AI reads your content and prepares it for refinement based on the target platform.
-
----
-
-## 2️⃣ Choose the Format
-
-Select the destination for your content: LinkedIn, Twitter/X, email, or general writing.
-
-> Each format has its own tone, length, and structural rules, applied automatically during refinement.
-
----
-
-## 3️⃣ AI-Powered Refinement
-
-Sypher AI processes your text through the Gemini-powered prompt layer, refining tone, clarity, and impact.
+Paste your raw text, choose the target platform — LinkedIn, Twitter/X, email, or general writing — and let Sypher AI refine it through the Gemini-powered prompt layer. Each format has its own tone, length, and structural rules, applied automatically during refinement.
 
 <img src="docs/screenshots/screenshot-2.png" width="900"/>
 
-The refinement evaluates:
+Compare the original draft with the refined version and export the final result. The refinement evaluates:
 
 - Tone and voice consistency
 - Clarity and readability
@@ -104,121 +118,15 @@ The refinement evaluates:
 
 ---
 
-## 4️⃣ Review & Export
-
-Compare the original draft with the refined version and copy the final result.
-
-> The refined text is ready to publish or send, tailored to the chosen format.
-
----
-
-# 📦 Installation
-
-Clone the repository:
-
-```
-git clone https://github.com/your-username/sypher-ai.git
-cd sypher-ai
-```
-
-Install dependencies:
-
-```
-npm install
-```
-
----
-
-# ⚙️ Environment Variables
-
-Create a `.env` file in the project root:
-
-```
-GEMINI_API_KEY=your_api_key_here
-```
-
-### 🔑 How to get the API Key
-
-You can obtain your Gemini API key via:
-
-- Google AI Studio: https://aistudio.google.com/
-
----
-
-# ▶️ Running the Development Server
-
-Start the development server:
-
-```
-npm run dev
-```
-
-Then open:
-
-```
-http://localhost:3000
-```
-
-The application will automatically reload when changes are made.
-
----
-
-# 🐳 Running with Docker
-
-1. Build image
-
-```
-docker build -t sypher-ai .
-```
-
-2. Run container
-
-```
-docker run -d -p 3000:3000 --env-file .env --name sypher-ai sypher-ai
-```
-
-3. Access
-
-```
-http://localhost:3000
-```
-
----
-
 # 📊 Key Features
 
 - **AI-Powered Text Refinement** – Refine drafts using Google Gemini with a custom prompt/data abstraction layer.
-
 - **Multi-Format Support** – Tailored refinement for LinkedIn posts, Twitter/X posts, emails, and general writing.
-
 - **Before/After Comparison** – Instantly compare the original draft with the refined version.
-
 - **Premium Animated Experience** – Smooth, high-end interactions powered by GSAP, Motion, and Three.js.
-
 - **Data Visualization** – Track and visualize refinement metrics with Recharts.
-
 - **Modern, Responsive Interface** – Built with React 19, Vite, and TailwindCSS for a fast, polished experience.
-
----
-
-# 🧱 Architecture
-
-Sypher AI follows a modular architecture.
-
-```
-Frontend (React + Vite)
-│
-├── Landing / Docs / About Pages
-├── Text Refinement Interface
-├── AI Demo Preview
-└── Data Visualization Layer (Recharts)
-
-Backend (Node.js + Express)
-│
-├── API Layer
-├── Prompt / Data Abstraction Layer
-└── Gemini AI Integration
-```
+- **Fully Serverless Deployment** – 100% Serverless AWS architecture (Lambda, API Gateway, S3, CloudFront), with a 97% smaller backend deploy package via esbuild optimization.
 
 ---
 
@@ -252,15 +160,62 @@ docs/
 
 ---
 
+# 📦 Local Development
+
+Clone the repository:
+
+```
+git clone https://github.com/Gustaavo-404/sypher-ai.git
+cd sypher-ai
+```
+
+Install dependencies:
+
+```
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```
+GEMINI_API_KEY=your_api_key_here
+VITE_API_URL=your_backend_api_url_here
+```
+
+You can obtain your Gemini API key via [Google AI Studio](https://aistudio.google.com/).
+
+`VITE_API_URL` should point to your backend endpoint (e.g. `http://localhost:3001` for local development, or the deployed API Gateway URL in production).
+
+### Running the Development Server
+
+```
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000). The application will automatically reload when changes are made.
+
+### Running with Docker
+
+```
+docker build -t sypher-ai .
+docker run -d -p 3000:3000 --env-file .env --name sypher-ai sypher-ai
+```
+
+Access at [http://localhost:3000](http://localhost:3000).
+
+---
+
 # 🎯 Use Cases
 
 Sypher AI is designed for:
 
-- content creators
-- marketing professionals
-- job seekers refining LinkedIn presence
-- founders and freelancers
-- anyone writing high-stakes professional text
+- Content creators
+- Marketing professionals
+- Job seekers refining their LinkedIn presence
+- Founders and freelancers
+- Anyone writing high-stakes professional text
 
 ---
 
@@ -268,11 +223,11 @@ Sypher AI is designed for:
 
 Planned improvements:
 
-- additional platform formats (Instagram, Medium, etc.)
-- tone presets and custom voice profiles
-- team/collaborative refinement workflows
-- refinement history and analytics dashboard
-- browser extension for inline refinement
+- Additional platform formats (Instagram, Medium, etc.)
+- Tone presets and custom voice profiles
+- Team/collaborative refinement workflows
+- Refinement history and analytics dashboard
+- Browser extension for inline refinement
 
 ---
 
@@ -282,4 +237,8 @@ Sypher AI is licensed under the MIT License.
 
 ---
 
-⭕ Sypher AI — From Draft to Excellence.
+<div align="center">
+
+⭕ **Sypher AI — From Draft to Excellence.**
+
+</div>
