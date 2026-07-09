@@ -50,6 +50,10 @@ function HelpTooltip({ text }: { text: string }) {
   );
 }
 
+// Higienização da URL de forma global para evitar barras duplicadas (//)
+const API_URL = import.meta.env.VITE_API_URL || "";
+const cleanUrl = API_URL.replace(/\/$/, "");
+
 const TUTORIAL_STEPS = {
   pt: [
     {
@@ -393,7 +397,7 @@ export default function App() {
     }, 500);
   };
 
-  // Core API call
+  // Core API call com suporte a RESPONSE STREAMING
   const handleGenerate = async () => {
     if (!rawInput.trim()) {
       addNotification(t.editor.step_1_placeholder.slice(0, 45) + "...", "info");
@@ -439,9 +443,7 @@ export default function App() {
     setIsGenerating(true);
     runGenerationMeters(async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "";
-
-        const response = await fetch(`${API_URL}/api/gemini/generate`, {
+        const response = await fetch(`${cleanUrl}/api/gemini/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -456,21 +458,52 @@ export default function App() {
           throw new Error("Erro do servidor ao gerar rascunho com IA.");
         }
 
-        const data = await response.json();
+        const contentType = response.headers.get("content-type");
 
-        setOutputText(data.text);
-        if (data.isSimulated) {
-          addNotification(
-            lang === 'en'
-              ? "Running in simulation sandbox mode! Add GEMINI_API_KEY to activate Gemini AI."
-              : lang === 'es'
-                ? "¡Simulador activo! Proporcione GEMINI_API_KEY para activar la IA en directo."
-                : "Simulador ativo! Para usar a IA real, coloque a GEMINI_API_KEY.",
-            "info"
-          );
+        // Tratamento Inteligente: Se o servidor responder com JSON (ex: Modo simulação ou erro)
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          setOutputText(data.text);
+          
+          if (data.isSimulated) {
+            addNotification(
+              lang === 'en'
+                ? "Running in simulation sandbox mode! Add GEMINI_API_KEY to activate Gemini AI."
+                : lang === 'es'
+                  ? "¡Simulador activo! Proporcione GEMINI_API_KEY para activar la IA en directo."
+                  : "Simulador ativo! Para usar a IA real, coloque a GEMINI_API_KEY.",
+              "info"
+            );
+          } else {
+            addNotification(
+              lang === 'en' ? "Draft successfully processed via Sypher core!" : lang === 'es' ? "¡Borrador refinado exitosamente!" : "Rascunho processado com maestria pelo Sypher AI!",
+              "success"
+            );
+          }
         } else {
+          // Tratamento para Streaming: Caso o servidor envie dados textuais sob demanda
+          const reader = response.body?.getReader();
+          if (!reader) {
+            throw new Error("Não foi possível iniciar o leitor de streaming.");
+          }
+
+          setOutputText(""); // Limpa o output para começar a renderizar as palavras
+          const decoder = new TextDecoder();
+          let accumulatedText = "";
+          let done = false;
+
+          while (!done) {
+            const { value, done: streamDone } = await reader.read();
+            done = streamDone;
+            if (value) {
+              const chunk = decoder.decode(value, { stream: !done });
+              accumulatedText += chunk;
+              setOutputText(accumulatedText);
+            }
+          }
+
           addNotification(
-            lang === 'en' ? "Draft successfully processed via Sypher core!" : lang === 'es' ? "¡Borrador refinado exitosamente!" : "Rascunho processado com maestria pelo Sypher AI!",
+            lang === 'en' ? "Draft generation completed!" : lang === 'es' ? "¡Generación del borrador completada!" : "Geração de rascunho concluída!",
             "success"
           );
         }
@@ -485,16 +518,14 @@ export default function App() {
     });
   };
 
-  // Refinement API call
+  // Refinement API call com suporte opcional a Response Streaming
   const handleRefine = async () => {
     if (!outputText) return;
     if (!refinementQuery.trim()) return;
 
     setIsRefining(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "";
-
-      const response = await fetch(`${API_URL}/api/gemini/generate`, {
+      const response = await fetch(`${cleanUrl}/api/gemini/refine`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -507,8 +538,33 @@ export default function App() {
         throw new Error("Erro no servidor ao refinar conteúdo.");
       }
 
-      const data = await response.json();
-      setOutputText(data.text);
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        setOutputText(data.text);
+      } else {
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error("Não foi possível iniciar o fluxo de refinamento.");
+        }
+
+        setOutputText("");
+        const decoder = new TextDecoder();
+        let accumulatedText = "";
+        let done = false;
+
+        while (!done) {
+          const { value, done: streamDone } = await reader.read();
+          done = streamDone;
+          if (value) {
+            const chunk = decoder.decode(value, { stream: !done });
+            accumulatedText += chunk;
+            setOutputText(accumulatedText);
+          }
+        }
+      }
+
       setRefinementQuery("");
       addNotification(
         lang === 'en' ? "Adjusted text successfully!" : lang === 'es' ? "¡Texto modificado con éxito!" : "Ajustes aplicados com sucesso!",

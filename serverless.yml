@@ -4,18 +4,16 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
-  timeout: 29
+  timeout: 60 
   environment:
     GEMINI_API_KEY: ${env:GEMINI_API_KEY}
     NODE_ENV: production
-  httpApi:
-    cors: true
 
 functions:
   api:
     handler: dist/server.handler
-    events:
-      - httpApi: '*'
+    timeout: 90
+    url: true
 
 package:
   patterns:
